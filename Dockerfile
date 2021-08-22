@@ -1,5 +1,5 @@
 # Use Alpine for tiny image
-FROM alpine:latest
+FROM alpine:latest AS build
 
 # Get version from build action (in turn from /version)
 ARG VERSION
@@ -8,11 +8,11 @@ ARG VERSION
 RUN sed -i 's|http://dl-cdn.alpinelinux.org|https://alpine.global.ssl.fastly.net|g' /etc/apk/repositories
 
 # Install PGP for verification
-RUN apk add --no-cache  gnupg
+RUN apk add --no-cache gcc glibc gnupg
 
 # Trusted Bitcoin keys
 # https://github.com/bitcoin/bitcoin/blob/master/contrib/verify-commits/trusted-keys
-ENV KEYS 71A3B16735405025D447E8F274810B012346C9A6 133EAC179436F14A5CF1B794860FEB804E669320
+ENV KEYS 71A3B16735405025D447E8F274810B012346C9A6 01EA5486DE18A882D4C2684590C8019E36C2E964
 RUN timeout 16s  gpg  --keyserver keyserver.ubuntu.com  --recv-keys $KEYS
 
 # Print imported keys, but also ensure there's no other keys in the system
@@ -36,8 +36,12 @@ RUN tar -xzf "bitcoin-$VERSION.tar.gz" && \
     rm  -f   "bitcoin-$VERSION.tar.gz"
 
 # Get BerkeleyDB source
-ADD https://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz
+ADD https://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz ./
 
 # Check source against known hash
 # https://github.com/bitcoin/bitcoin/blob/master/contrib/install_db4.sh
-#ENV BDB_HASH='12edc0df75bf9abd7f82f821795bcee50f42cb2e5f76a6a281b85732798364ef'
+RUN echo "12edc0df75bf9abd7f82f821795bcee50f42cb2e5f76a6a281b85732798364ef  db-4.8.30.NC.tar.gz" | sha256sum -c && \
+    tar -xzvf db-4.8.30.NC.tar.gz && \
+    rm -f db-4.8.30.NC.tar.gz && \
+    ./db-4.8.30.NC/dist/configure && \
+    make install -vvvv db-4.8.30.NC/
