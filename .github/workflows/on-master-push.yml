@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set version from env
-        run: cat version >> $VERSION
+        run: echo "version=$(cat version)" >> $GITHUB_ENV
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -37,7 +37,7 @@ jobs:
         run: |
           docker buildx build \
           --platform linux/amd64,linux/arm64,linux/arm/v7 \
-          --build-arg VERSION=$VERSION \
-          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:$VERSION \
+          --build-arg VERSION=${{ env.version }} \
+          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.version }} \
           --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind \
           --output "type=registry" .
