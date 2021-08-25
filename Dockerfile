@@ -16,8 +16,9 @@ RUN wget https://zlib.net/zlib-1.2.11.tar.gz && \
     cd /usr/src/zlib-1.2.11; ./configure; make; make install
 
 ENV CONFIG_SITE=/bitcoin/depends/x86_64-pc-linux-musl/share/config.site
-RUN cd /bitcoin; ./autogen.sh; ./contrib/install_db4.sh `pwd`
-RUN ./configure --disable-ccache \
+
+RUN cd /bitcoin; ./autogen.sh; ./contrib/install_db4.sh `pwd` && \
+    ./configure --disable-ccache \
     --disable-maintainer-mode \
     --disable-dependency-tracking \
     --enable-reduce-exports --disable-bench \
@@ -30,10 +31,11 @@ RUN ./configure --disable-ccache \
     LDFLAGS="-s -static-libgcc -static-libstdc++ -Wl,-O2" \
     BDB_LIBS="-L`pwd`/db4/lib -ldb_cxx-4.8" \
     BDB_CFLAGS="-I`pwd`/db4/include"
-RUN make
-RUN make install
 
-FROM scratch
+RUN make && \
+    make install
+
+FROM alpine:latest
 COPY --from=build /usr/local /usr/local
 COPY --from=build /bitcoin/share/examples/bitcoin.conf /.bitcoin/bitcoin.conf
 
