@@ -1,6 +1,10 @@
 name: Build on push
 
-on: push
+on:  
+  push:
+  pull_request:
+    branches:
+      - master
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
@@ -9,8 +13,6 @@ jobs:
   build:
     name: Build bitcoind image
     runs-on: ubuntu-latest
-    env:
-      PUSH: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     steps:
       - name: Checkout project
         uses: actions/checkout@v2
@@ -34,16 +36,15 @@ jobs:
           docker buildx build \
           --platform $(cat PLATFORMS | tr '\n' ',') \
           --build-arg VERSION=${{ env.VERSION }} \
-          --tag bitcoind \
+          --tag bitcoind:local \
           --output "type=image,push=false" .
       
       - name: Test build okay
         run: docker run --rm ofawx/bitcoind sh -c "bitcoind --version | grep ${{ env.VERSION }}"
 
       - name: Push bitcoind to Docker Hub
-        if: ${{ env.PUSH }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker tag bitcoind ${{ secrets.DOCKER_USERNAME }}/bitcoind
-          docker tag bitcoind ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.VERSION }}
-          docker image push -a ${{ secrets.DOCKER_USERNAME }}/bitcoind
+          docker tag bitcoind:local ${{ secrets.DOCKER_USERNAME }}/bitcoind
+          docker tag bitcoind:local ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.VERSION }}
