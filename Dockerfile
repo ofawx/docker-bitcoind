@@ -14,7 +14,7 @@ RUN cd /bitcoin/depends; make NO_QT=1
 RUN wget https://zlib.net/zlib-1.2.11.tar.gz && \
     echo "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1  zlib-1.2.11.tar.gz" | sha256sum -c && \
     mkdir -p /usr/src/zlib; tar zxvf zlib-1.2.11.tar.gz -C /usr/src && \
-    cd /usr/src/zlib-1.2.11; ./configure; make -j"$(($(nproc)+1))"; make install
+    cd /usr/src/zlib-1.2.11; ./configure; make -j"$(($(nproc)+1))"; make -j"$(($(nproc)+1))" install
 
 RUN export CONFIG_SITE=/bitcoin/depends/$(/bitcoin/depends/config.guess)/share/config.site && \
     cd /bitcoin; ./autogen.sh; ./contrib/install_db4.sh . && \
@@ -33,7 +33,7 @@ RUN export CONFIG_SITE=/bitcoin/depends/$(/bitcoin/depends/config.guess)/share/c
     BDB_CFLAGS="-I/bitcoin/db4/include"
 
 RUN make -j"$(($(nproc)+1))" && \
-    make install
+    make -j"$(($(nproc)+1))" install
 
 FROM alpine:latest
 COPY --from=build /usr/local /usr/local
