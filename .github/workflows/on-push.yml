@@ -1,4 +1,4 @@
-name: Build on push
+name: Build on master PR or push
 
 on:  
   push:
@@ -46,7 +46,9 @@ jobs:
           --output "type=image,push=false" .
       
       - name: Test build okay
-        run: docker run --rm bitcoind:local sh -c "bitcoind --version | grep ${{ env.VERSION }}"
+        run: |
+          docker run --rm ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.VERSION }} \
+          sh -c "bitcoind --version | grep ${{ env.VERSION }}"
 
       - name: Push bitcoind to Docker Hub
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
