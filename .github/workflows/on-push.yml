@@ -39,22 +39,17 @@ jobs:
       - name: Test build in x64
         run: |
           docker buildx build \
-          --platform linux/amd64 \
+          --platform $(cat PLATFORMS | tr '\n' ',') \
           --build-arg VERSION=${{ env.VERSION }} \
-          --tag test-build:test
+          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind \
+          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.VERSION }} \
           --output "type=image,push=false" .
       
       - name: Test build okay
         run: |
-          docker run --rm test-build:test \
+          docker run --rm ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.VERSION }} \
           sh -c "bitcoind --version | grep ${{ env.VERSION }}"
 
-      - name: Build multiarch and push to Docker Hub
+      - name: Push bitcoind to Docker Hub
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        run: |
-          docker buildx build \
-          --platform $(cat PLATFORMS | tr '\n' ',') \
-          --build-arg VERSION=${{ env.version }} \
-          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.version }} \
-          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind \
-          --output "type=registry" .
+        run: docker image push -a ${{ secrets.DOCKER_USERNAME }}/bitcoind
