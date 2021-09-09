@@ -41,7 +41,7 @@ jobs:
           docker buildx build \
           --platform linux/amd64 \
           --build-arg VERSION=${{ env.VERSION }} \
-          --tag test-build:test
+          --tag test-build:test \
           --output "type=image,push=false" .
       
       - name: Test build okay
