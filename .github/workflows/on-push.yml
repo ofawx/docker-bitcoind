@@ -41,12 +41,12 @@ jobs:
           docker buildx build \
           --platform linux/amd64 \
           --build-arg VERSION=${{ env.VERSION }} \
-          --tag test-build:test \
+          --tag ${{ secrets.DOCKER_USERNAME }}/test-build:test \
           --output "type=image,push=false" .
       
       - name: Test build okay
         run: |
-          docker run --rm test-build:test \
+          docker run --rm ${{ secrets.DOCKER_USERNAME }}/test-build:test \
           sh -c "bitcoind --version | grep ${{ env.VERSION }}"
 
       - name: Build multiarch and push to Docker Hub
