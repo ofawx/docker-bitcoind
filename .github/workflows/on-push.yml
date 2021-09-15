@@ -36,20 +36,25 @@ jobs:
       - name: Show available Docker buildx platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
-      - name: Run Docker buildx
+      - name: Test build in x64
         run: |
           docker buildx build \
-          --platform $(cat PLATFORMS | tr '\n' ',') \
+          --platform linux/amd64 \
           --build-arg VERSION=${{ env.VERSION }} \
-          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind \
-          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.VERSION }} \
-          --output "type=image,push=false" .
+          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:test \
+          --output "type=docker" .
       
       - name: Test build okay
         run: |
-          docker run --rm ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.VERSION }} \
+          docker run --rm ${{ secrets.DOCKER_USERNAME }}/bitcoind:test \
           sh -c "bitcoind --version | grep ${{ env.VERSION }}"
 
-      - name: Push bitcoind to Docker Hub
+      - name: Build multiarch and push to Docker Hub
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        run: docker image push -a ${{ secrets.DOCKER_USERNAME }}/bitcoind
+        run: |
+          docker buildx build \
+          --platform $(cat PLATFORMS | tr '\n' ',') \
+          --build-arg VERSION=${{ env.version }} \
+          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.version }} \
+          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind \
+          --output "type=registry" .
