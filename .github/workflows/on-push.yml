@@ -54,7 +54,7 @@ jobs:
         run: |
           docker buildx build \
           --platform $(cat PLATFORMS | tr '\n' ',') \
-          --build-arg VERSION=${{ env.version }} \
-          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.version }} \
+          --build-arg VERSION=${{ env.VERSION }} \
+          --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:${{ env.VERSION }} \
           --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind \
           --output "type=registry" .
