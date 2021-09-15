@@ -42,10 +42,7 @@ jobs:
           --platform linux/amd64 \
           --build-arg VERSION=${{ env.VERSION }} \
           --tag ${{ secrets.DOCKER_USERNAME }}/bitcoind:test \
-          --output "type=image,push=false" .
-
-      - name: List images
-        run: docker images ls
+          --output "type=docker" .
       
       - name: Test build okay
         run: |
