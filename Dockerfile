@@ -17,7 +17,7 @@ RUN wget https://zlib.net/zlib-1.3.tar.gz && \
     cd /usr/src/zlib-1.3; ./configure; make -j"$(($(nproc)+1))"; make -j"$(($(nproc)+1))" install
 
 RUN export CONFIG_SITE=/bitcoin/depends/$(/bitcoin/depends/config.guess)/share/config.site && \
-    cd /bitcoin; ./autogen.sh; ./contrib/install_db4.sh . && \
+    cd /bitcoin; ./autogen.sh; \
     ./configure --disable-ccache \
     --disable-maintainer-mode \
     --disable-dependency-tracking \
@@ -28,9 +28,7 @@ RUN export CONFIG_SITE=/bitcoin/depends/$(/bitcoin/depends/config.guess)/share/c
     --without-miniupnpc \
     CFLAGS="-O2 -g0 --static -static -fPIC" \
     CXXFLAGS="-O2 -g0 --static -static -fPIC" \
-    LDFLAGS="-s -static-libgcc -static-libstdc++ -Wl,-O2" \
-    BDB_LIBS="-L/bitcoin/db4/lib -ldb_cxx-4.8" \
-    BDB_CFLAGS="-I/bitcoin/db4/include"
+    LDFLAGS="-s -static-libgcc -static-libstdc++ -Wl,-O2"
 
 RUN make -j"$(($(nproc)+1))" && \
     make -j"$(($(nproc)+1))" install
