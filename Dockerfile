@@ -41,4 +41,4 @@ VOLUME ["/.bitcoin"]
 
 EXPOSE 8332 8333 18332 18333 18444
 
-CMD ["/usr/local/bin/bitcoind", "-printtoconsole"]
+ENTRYPOINT ["/usr/local/bin/bitcoind", "-printtoconsole"]
