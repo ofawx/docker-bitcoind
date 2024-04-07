@@ -11,10 +11,10 @@ WORKDIR /bitcoin
 
 RUN cd /bitcoin/depends; make NO_QT=1
 
-RUN wget https://zlib.net/zlib-1.3.tar.gz && \
-    echo "ff0ba4c292013dbc27530b3a81e1f9a813cd39de01ca5e0f8bf355702efa593e  zlib-1.3.tar.gz" | sha256sum -c && \
-    mkdir -p /usr/src/zlib; tar zxvf zlib-1.3.tar.gz -C /usr/src && \
-    cd /usr/src/zlib-1.3; ./configure; make -j"$(($(nproc)+1))"; make -j"$(($(nproc)+1))" install
+RUN wget https://zlib.net/zlib-1.3.1.tar.gz && \
+    echo "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23  zlib-1.3.1.tar.gz" | sha256sum -c && \
+    mkdir -p /usr/src/zlib; tar zxvf zlib-1.3.1.tar.gz -C /usr/src && \
+    cd /usr/src/zlib-1.3.1; ./configure; make -j"$(($(nproc)+1))"; make -j"$(($(nproc)+1))" install
 
 RUN export CONFIG_SITE=/bitcoin/depends/$(/bitcoin/depends/config.guess)/share/config.site && \
     cd /bitcoin; ./autogen.sh; \

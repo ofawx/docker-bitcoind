@@ -46,8 +46,8 @@ jobs:
       
       - name: Test build okay
         run: |
-          docker run --rm ${{ secrets.DOCKER_USERNAME }}/bitcoind:test \
-          sh -c "bitcoind --version | grep ${{ env.VERSION }}"
+          docker run --rm ${{ secrets.DOCKER_USERNAME }}/bitcoind:test --version \
+          | grep ${{ env.VERSION }}
 
       - name: Build multiarch and push to Docker Hub
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
