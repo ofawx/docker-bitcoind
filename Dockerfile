@@ -1,7 +1,18 @@
 FROM alpine AS build
 
-RUN apk --no-cache add autoconf automake libtool boost-dev libevent-dev libffi-dev openssl-dev bash coreutils git && \
-    apk --no-cache add --update alpine-sdk build-base
+RUN apk --no-cache add \
+        autoconf \
+        automake \
+        bash \
+        boost-dev \
+        coreutils \
+        curl \
+        git \
+        libevent-dev \
+        libffi-dev \
+        libtool \
+        openssl-dev \
+    && apk --no-cache add --update alpine-sdk build-base
 
 ARG VERSION
 
