@@ -6,6 +6,7 @@ RUN apk --no-cache add \
         bash \
         boost-dev \
         coreutils \
+        cmake \
         curl \
         git \
         libevent-dev \
@@ -20,7 +21,7 @@ RUN git clone --depth 1 https://github.com/bitcoin/bitcoin.git --branch v$VERSIO
 
 WORKDIR /bitcoin
 
-RUN cd /bitcoin/depends; make NO_QT=1
+RUN cd /bitcoin/depends; make NO_QT=1 -j"$(($(nproc)+1))"
 
 RUN wget https://zlib.net/zlib-1.3.1.tar.gz && \
     echo "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23  zlib-1.3.1.tar.gz" | sha256sum -c && \
