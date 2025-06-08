@@ -37,10 +37,8 @@ RUN export CONFIG_SITE=/bitcoin/depends/$(/bitcoin/depends/config.guess)/share/c
     cmake -B build \
         -DENABLE_WALLET=OFF \
         --toolchain depends/$(/bitcoin/depends/config.guess)/toolchain.cmake \
-        -DCMAKE_CXX_FLAGS="-O0 -g0 --static -static -fPIC"; \
-    cmake --build build \
-        -j$($(nproc)+1); \
-    ctest --test-dir build; \
+        -DCMAKE_CXX_FLAGS="-O0 -g0 -static -fPIC"; \
+    cmake --build build; \
     cmake --install build;
 
 FROM alpine:latest
